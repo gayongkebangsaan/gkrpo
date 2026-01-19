@@ -18,8 +18,6 @@
     "express": "^4.18.2"
   },
   "devDependencies": {
-    "nodemon": "^2.0.22",
     "prisma": "^5.0.0"
   }
 }
-
