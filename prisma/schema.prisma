@@ -66,6 +66,7 @@ model Rangkaian {
 model Pembayaran {
   id                        Int      @id @default(autoincrement())
   payerUserId               Int
+  payer                     User     @relation(fields: [payerUserId], references: [id])
   paymentType               String
   amount                    Decimal  @db.Decimal(10, 2)
   currency                  String   @default("MYR")
