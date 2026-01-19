@@ -1,0 +1,109 @@
+// Prisma schema dikemaskini untuk MySQL dengan Decimal(10,2)
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  email     String   @unique
+  telefon   String?
+  role      String
+  status    String   @default("pending")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  profil    ProfilAhli?
+  pembayaran Pembayaran[]
+}
+
+model ProfilAhli {
+  id                 Int     @id @default(autoincrement())
+  userId             Int     @unique
+  namaPenuh          String
+  alamat             String?
+  noTelefon          String?
+  noKP_ciphertext    String? // disulitkan at-rest
+  pekerjaan          String?
+  tempatLahir        String?
+  tarikhLahir        DateTime?
+  namaGelanggang     String?
+  gurulatihUserId    Int?
+  gelanggangId       Int?
+  daerah             String?
+  negeri             String?
+  bengkung           String?
+  noAhli             String?
+  statusAhli         String  @default("Ahli Biasa")
+  sandangBerjawatan  String?
+  approvedByHQ       Boolean @default(false)
+  approvedAt         DateTime?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  user               User    @relation(fields: [userId], references: [id])
+}
+
+model Rangkaian {
+  id                                Int  @id @default(autoincrement())
+  ahliUserId                        Int  @unique
+  sponsorUserId                     Int?
+  uplinePembantuGurulatihUserId     Int?
+  uplineGurulatihMudaUserId         Int?
+  uplineGurulatihUserId             Int?
+  uplineGurulatihKananUserId        Int?
+  uplineGurulatihTertinggiUserId    Int?
+  daerahOwnerUserId                 Int?
+  negeriOwnerUserId                 Int?
+  pssgmkHqOwnerUserId               Int?
+  pentadbirWebOwnerUserId           Int?
+  createdAt                         DateTime @default(now())
+}
+
+model Pembayaran {
+  id                        Int      @id @default(autoincrement())
+  payerUserId               Int
+  payer                     User     @relation(fields: [payerUserId], references: [id])
+  paymentType               String
+  amount                    Decimal  @db.Decimal(10, 2)
+  currency                  String   @default("MYR")
+  tahun                     Int?
+  bulan                     Int?
+  gelanggangId              Int?
+  status                    String   @default("pending")
+  paymentProvider           String?
+  stripePaymentIntentId     String?
+  stripeCheckoutSessionId   String?
+  paidAt                    DateTime?
+  requiresApproval          Boolean  @default(false)
+  approvedByUserId          Int?
+  approvedAt                DateTime?
+  nota                      String?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
+}
+
+model LedgerKomisyen {
+  id               Int      @id @default(autoincrement())
+  pembayaranId     Int
+  penerimaUserId   Int
+  penerimaRole     String
+  amount           Decimal  @db.Decimal(10, 2)
+  status           String   @default("pending")
+  stripeTransferId String?
+  createdAt        DateTime @default(now())
+}
+
+model JadualYuranBengkung {
+  id               Int      @id @default(autoincrement())
+  namaBengkung     String   @unique
+  gurulatihAmount  Decimal  @db.Decimal(10, 2)
+  negeriAmount     Decimal  @db.Decimal(10, 2)
+  pssgmkHqAmount   Decimal  @db.Decimal(10, 2)
+  totalAmount      Decimal  @db.Decimal(10, 2)
+  createdAt        DateTime @default(now())
+}
+
